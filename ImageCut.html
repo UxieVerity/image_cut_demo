@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="UxieVerity">
+    <title>cut_demo</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="static/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="row">
+    <div class="col-lg-1"></div>
+    <div class="col-lg-5">
+        <br>
+        <div class="card">
+            <div class="card-body" style="height: 500px;">
+                <br>
+                <form class="form-horizontal form-material " method="post">
+                    <div class="form-group">
+                        <div class="col-md-12" >
+                            <input type="text" id="photoname" placeholder="点击这里选择图片" class="form-control form-control-line" onclick="$('#photo').click()">
+                            <div><br></div>
+                            <input type="file" class="form-control-file " style="display: none" name="photo" id="photo">
+                            <div id="img_div" >
+                                <img src="" id="img" class="img-responsive center-block" >
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-md-12" align="right">
+                    <button type="button" class="btn btn-primary" onclick="cut()">裁剪所选部分</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <br>
+        <div class="card">
+            <div class="card-body" style="height: 500px;">
+                <br>
+                <div id="imgs" class="col-md-12" ></div>
+                <br>
+                <div class="col-md-12" align="right">
+                    <button type="button" class="btn btn-primary" onclick="download()">保存图片</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="static/plugins/jquery/jquery.min.js"></script>
+<script src="static/plugins/bootstrap/js/tether.min.js"></script>
+<script src="static/plugins/bootstrap/js/bootstrap.min.js"></script>
+<script src="static/canvas2image.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        $('#photo').on('change',function () {
+            var pos=this.value.lastIndexOf("\\");
+            document.getElementById("photoname").value = this.value.substring(pos+1);
+            var file = $('#photo').get(0).files[0];
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e){
+                img = $('#img');
+                img.get(0).src = e.target.result;
+                var height = img.width()*7/11;
+                var img_div = document.getElementById('img_div');
+                img_div.style = "height:"+height+"px;"+"overflow-y:scroll;";
+            }
+        });
+    });
+
+    function cut() {
+        var $imgs = document.getElementById('imgs');
+        $imgs.innerHTML = "";
+        var $img_div = $('#img_div');
+        var height = $img_div.height();
+        var $img = document.getElementById('img');
+        var rate = $img.width/$img.naturalWidth;
+        var cut_height = (height+$img_div.scrollTop())/rate;
+        $imgs.appendChild(Canvas2Image.convertToImage($img, $img.naturalWidth,cut_height, "png"))
+    }
+
+    function download() {
+        var url = document.getElementById('cut').src;
+        var a = document.createElement('a');
+        var event = new MouseEvent('click');
+        var photoname = $('#photoname').val().split(".")[0];
+        a.download = name || photoname;
+        a.href = url;
+        a.dispatchEvent(event)
+    }
+</script>
